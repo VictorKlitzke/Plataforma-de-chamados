@@ -4,10 +4,9 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 exports.login = async (req, res) => {
-    const {username, password} = req.body;
+    const { username, password } = req.body;
 
     try {
-
         const [rows] = await pool.query("SELECT * FROM users WHERE name = ?", [username]);
 
         if (!rows || rows.length === 0) {
@@ -15,24 +14,38 @@ exports.login = async (req, res) => {
         }
 
         const user = rows[0];
-
         if (!user.password) {
             return res.status(500).json({ error: "Senha não encontrada para o usuário" });
         }
-        user.password = user.password.replace("$2y$", "$2a$");
 
+        user.password = user.password.replace("$2y$", "$2a$");
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: "Usuário ou senha inválidos" });
+        if (!isPasswordValid) { 
+            return res.status(401).json({ error: "Senha incorreta" });
         }
 
-        const token = jwt.sign({ id: user.id, username: user.username }, process.env.TOKEN, { expiresIn: "1h" });
-        res.json({ message: "Login realizado com sucesso", token });
+        const token = jwt.sign({ id: user.id }, process.env.TOKEN, { expiresIn: "3h" });
+            
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            maxAge: 18000000
+        })
+
+        return res.json({ authorization: true, message: "Login realizado com sucesso" });
 
     } catch (error) {
         console.error("Erro ao realizar login:", error.message);
-        res.status(500).json({ error: "Erro interno no servidor" });
+        return res.status(500).json({ error: "Erro interno no servidor" });
     }
+};
+
+exports.loggout = async (res, req) => {
+    if (res.cookies['token']) {
+        res.cookie('token', '', {expires: new Date(0), path: '/'});
+    }
+    res.status(200).json({authorization: true})
 }
 
 exports.registerCalled = async (req, res) => {

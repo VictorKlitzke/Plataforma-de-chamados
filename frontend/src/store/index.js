@@ -8,7 +8,7 @@ export const useCalledStore = defineStore('calledStore', {
         isLoading: false,
         error: null,
     }),
-    actions:{
+    actions: {
         async createCalled(payload) {
             this.isLoading = true;
             this.error = null;
@@ -28,27 +28,26 @@ export const useCalledStore = defineStore('calledStore', {
     }
 })
 
-export const GetCalled = defineStore('listCalled', {
+export const useGetCalled = defineStore('listCalled', {
     state: () => ({
         isLoading: false,
         list: [],
     }),
     actions: {
-        async getList () {
+        async getList() {
             if (!this.isLoading) {
                 try {
-                    const { data, status } = await getCalled();
-                    if (status === 200) {
-                        this.list = data;
-                        this.isLoading = true;
-                    }
+                    const data = await getCalled();
+                    console.log(data);
+                    this.list = data;
+                    this.isLoading = true;
                 } catch (error) {
                     console.log(error);
                     this.isLoading = false;
                 }
             }
         },
-        async realoadList () {
+        async realoadList() {
             try {
                 const { data, status } = await getCalled();
                 if (status === 200) {

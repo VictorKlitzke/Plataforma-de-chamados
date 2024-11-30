@@ -2,13 +2,14 @@ import axios from "axios";
 
 export const login = async (username, password) => {
     try {
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/login`, {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}login`, {
             username,
             password
         });
-        return response.data;
+        localStorage.setItem('token', response.data.token)
+        return response.data.token;
     } catch (error) {
-        console.log(error.response?.data?.message || 'Erro ao realizar login');
+        console.log(error || 'Erro ao realizar login');
     }
 }
 
@@ -44,11 +45,21 @@ export const registerCalled = async () => {
 export const getCalled = async () => {
     try {
 
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/listCalled`);
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Token not found');
+
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}listCalled`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        console.log(response.data);
 
         return response.data;
 
     } catch (error) {
-        console.log(error || 'Erro ao buscar listas de chamados');
+        console.error(error.message || 'Erro ao buscar lista de chamados');
+        throw error;
     }
 }

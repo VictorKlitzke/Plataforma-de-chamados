@@ -2,28 +2,38 @@ const jwt = require('jsonwebtoken');
 const pool = require('../database/index');
 
 module.exports = async (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.cookies['token'];
 
   if (!token) {
-    return res.status(401).json({ message: 'Token não encontrado' });
+    return res.status(401).json({ message: '[AVISO] - TOKEN NÃO INFORMADO' });
   }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.TOKEN);
+    const userId = decoded.id;
 
-    pool.query('SELECT * FROM users WHERE id = ?', [decoded.userId], (err, results) => {
-      if (err) {
-        return res.status(500).json({ message: 'Erro ao consultar o banco de dados' });
-      }
+    console.log(userId);
+    
+    const [result] = await pool.query("SELECT * FROM users WHERE id = ?", [userId]);
 
-      if (results.length === 0) {
-        return res.status(401).json({ message: 'Usuário não encontrado' });
-      }
+    if (!result || result.length === 0) {
+      return res
+        .status(404)
+        .json({ message: '[AVISO] - USUÁRIO NÃO ENCONTRADO' });
+    }
 
-      req.user = results[0];
-      next(); 
-    });
-
+    req.user = result[0];
+    next();
   } catch (error) {
-    console.error(error);
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res
+        .status(403)
+        .json({ message: '[AVISO] - AUTENTICAÇÃO NÃO VALIDADA' });
+    } else {
+      console.error('[AVISO] - ERRO AO VERIFICAR USUÁRIO:', error);
+      return res
+        .status(500)
+        .json({ message: '[AVISO] - ERRO INTERNO DO SERVIDOR' });
+    }
   }
-}
+};
