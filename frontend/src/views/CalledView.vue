@@ -11,11 +11,14 @@
     <div v-else-if="store.error" class="text-danger text-center">
       <p>{{ store.error }}</p>
     </div>
-    <div v-else-if="chamados.length === 0" class="text-center">
-      <p>Nenhum chamado encontrado.</p>
-    </div>
-    <div v-else class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-      <table class="table table-striped table-hover align-middle text-center bg-white rounded-3 shadow-sm">
+    <div
+      v-else
+      class="table-responsive"
+      style="max-height: 400px; overflow-y: auto"
+    >
+      <table
+        class="table table-striped table-hover align-middle text-center bg-white rounded-3 shadow-sm"
+      >
         <thead class="table-dark text-light">
           <tr>
             <th>#</th>
@@ -26,14 +29,37 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="chamado in chamados" :key="chamado.id">
+          <tr v-if="!called">
+            <td colspan="5">Nenhum chamado encontrado.</td>
+          </tr>
+          <tr v-for="chamado in called" :key="chamado.id">
             <td>{{ chamado.id }}</td>
             <td>{{ chamado.title }}</td>
-            <td>{{ chamado.priority }}</td>
-            <td>{{ chamado.status }}</td>
             <td>
-              <button class="btn btn-info btn-sm">Visualizar</button>
-              <button class="btn btn-danger btn-sm">Excluir</button>
+              <span
+                :class="{
+                  'badge bg-dark': chamado.priority === 'Alta',
+                  'badge bg-warning text-dark': chamado.priority === 'Média',
+                  'badge bg-success': chamado.priority === 'Baixa',
+                }"
+              >
+                {{ chamado.priority }}
+              </span>
+            </td>
+            <td>
+              <span
+                :class="{
+                  'text-success fw-bold': chamado.status === 'Concluído',
+                  'text-danger fw-bold': chamado.status === 'Aberto',
+                  'text-warning fw-bold': chamado.status === 'Em Andamento',
+                }"
+              >
+                {{ chamado.status }}
+              </span>
+            </td>
+            <td class="d-flex gap-2">
+              <button class="btn btn-info btn-sm p-2 w-100">Visualizar</button>
+              <button class="btn btn-danger btn-sm p-2 w-100">Excluir</button>
             </td>
           </tr>
         </tbody>
@@ -50,30 +76,25 @@ const store = useCalledStore();
 const storeListCalled = useGetCalled();
 
 const chamados = ref([]);
+const called = ref(null);
 const title = ref("");
 const description = ref("");
 const priority = ref("");
 const imagens = ref([]);
 
 // LISTA DE CHAMADOS ABERTO PARTE DO CLIENTE //
-const useCalledData = () => {
-  const loadCalled = async () => {
-    try {
-      await storeListCalled.getList();
-    } catch (error) {
-      console.error("Erro ao carregar chamados:", error);
-    }
-  };
-  return {
-    chamados: computed(() => storeListCalled.list),
-    loadCalled,
-  };
+const loadCalled = async () => {
+  try {
+    await storeListCalled.getList();
+    chamados.value = storeListCalled.list;
+    called.value = chamados.value.chamados;
+  } catch (error) {
+    console.error("Erro ao carregar chamados:", error);
+  }
 };
 
-const { loadCalled } = useCalledData();
-
-onMounted(async () => {
-  await loadCalled();
+onMounted(() => {
+  loadCalled();
 });
 
 // MODAL DE ABERTURA DO CHAMADO
@@ -101,6 +122,7 @@ const removeImage = (index) => {
   imagens.value.splice(index, 1);
 };
 
+// REGISTRAR ABERTURA DE CHAMADOS
 const RegisterCalled = async () => {
   try {
     const payload = {

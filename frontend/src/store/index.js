@@ -38,7 +38,6 @@ export const useGetCalled = defineStore('listCalled', {
             if (!this.isLoading) {
                 try {
                     const data = await getCalled();
-                    console.log(data);
                     this.list = data;
                     this.isLoading = true;
                 } catch (error) {

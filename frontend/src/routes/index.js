@@ -23,6 +23,13 @@ const routes = [
         meta: {showInSidebar: true},
         children: [
             {
+                path: '/home',
+                name: 'dashboard',
+                auth: true,
+                component: DashboardView,
+                meta: {showInSidebar: false},
+            },
+            {
                 path: '/chamados',
                 name: 'chamados',
                 auth: true,

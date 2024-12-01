@@ -13,14 +13,24 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const user = ref(localStorage.getItem('username') || 'Usuário Desconhecido');
 const username = user.value;
 const router = useRouter();
 
-const logout = () => {
+const removeStorage = () => {
   localStorage.removeItem('username');
   user.value = 'Usuário Desconhecido';
-  router.push({ name: 'login' });
+}
+
+const logout = async () => {
+  try {
+    await axios.post(`${import.meta.env.VITE_BASE_URL}logout`, {}, { withCredentials: true });
+    removeStorage();
+    router.push({ name: 'login' });
+  } catch (error) {
+    console.error('Erro ao realizar logout:', error.message);
+  }
 };
 </script>

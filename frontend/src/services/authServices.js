@@ -1,13 +1,16 @@
 import axios from "axios";
+import Cookies from 'js-cookie';
 
 export const login = async (username, password) => {
     try {
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}login`, {
             username,
             password
+        }, {
+            withCredentials: true
         });
-        localStorage.setItem('token', response.data.token)
-        return response.data.token;
+        console.log(response.data)
+        return response.data;
     } catch (error) {
         console.log(error || 'Erro ao realizar login');
     }
@@ -34,6 +37,8 @@ export const registerCalled = async () => {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
+        }, {
+            withCredentials: true,
         });
 
         return response.data;
@@ -45,13 +50,8 @@ export const registerCalled = async () => {
 export const getCalled = async () => {
     try {
 
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Token not found');
-
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}listCalled`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            withCredentials: true
         });
 
         console.log(response.data);
