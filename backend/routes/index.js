@@ -7,9 +7,14 @@ const authGet = require("../controllers/gets");
 const upload = require('../middleware/index');
 const auth = require("../middleware/auth");
 
-router.post("/login", authControllers.login)
-router.post("/registerCalled", upload.array('attachments', 10), auth, authControllers.registerCalled)
+// LOGIN e LOGGOUT
+router.post("/login", authControllers.login);
+router.post("/logout", auth, authControllers.logout);
 
+// CADASTROS
+router.post("/registerCalled", auth, upload.array('attachments', 10), authControllers.registerCalled);
+
+// LISTAS
 router.get("/listCalled", auth, authGet.getCalled)
 
 module.exports = router

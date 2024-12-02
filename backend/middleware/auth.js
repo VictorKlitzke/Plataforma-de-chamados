@@ -11,8 +11,6 @@ module.exports = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.TOKEN);
     const userId = decoded.id;
-
-    console.log(userId);
     
     const [result] = await pool.query("SELECT * FROM users WHERE id = ?", [userId]);
 
@@ -21,7 +19,6 @@ module.exports = async (req, res, next) => {
         .status(404)
         .json({ message: '[AVISO] - USUÁRIO NÃO ENCONTRADO' });
     }
-
     req.user = result[0];
     next();
   } catch (error) {

@@ -33,7 +33,7 @@ exports.login = async (req, res) => {
             maxAge: 18000000
         })
 
-        return res.json({ authorization: true, message: "Login realizado com sucesso" });
+        return res.json({ authorization: true, message: "Login realizado com sucesso", UserId: user.id });
 
     } catch (error) {
         console.error("Erro ao realizar login:", error.message);
@@ -41,27 +41,29 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.loggout = async (res, req) => {
-    if (res.cookies['token']) {
-        res.cookie('token', '', {expires: new Date(0), path: '/'});
+exports.logout = async (req, res) => {
+    const token = req.cookies['token']
+    console.log(req.cookies['token']);
+    
+    if (token) {
+        res.cookie('token', '', { expires: new Date(0), path: '/' });
     }
-    res.status(200).json({authorization: true})
+    res.status(200).json({ authorization: false, message: 'Logout realizado com sucesso' });
 }
 
 exports.registerCalled = async (req, res) => {
-    const { title, description, priority } = req.body;
+    const { title, description, priority, category, contact } = req.body;
 
-    if (!title || !description || !priority) {
+    const token = req.cookies['token'];
+    const decoded = jwt.verify(token, process.env.TOKEN);
+    const userId = decoded.id;
+
+    console.log(title, description, priority, userId, category, contact)
+
+    if (!title || !description || !priority || !userId || !category || !contact) {
         return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
     }
 
-    const validPriorities = ['Baixa', 'Média', 'Alta'];
-    if (!validPriorities.includes(priority)) {
-        return res.status(400).json({ message: 'Prioridade inválida.' });
-
-    }
-
-    const userId = 203;
     const status = 'Aberto';
     const attachments = req.files || [];
     const connection = await pool.getConnection();
@@ -71,10 +73,10 @@ exports.registerCalled = async (req, res) => {
         await connection.beginTransaction();
 
         const queryCalled = `
-            INSERT INTO calleds (title, description, priority, status, user_id)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO calleds (title, description, priority, status, user_id, category, contact_client)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        const [result] = await connection.execute(queryCalled, [title, description, priority, status, userId]);
+        const [result] = await connection.execute(queryCalled, [title, description, priority.trim(), status, userId, category, contact]);
         const calledId = result.insertId;
 
         if (attachments.length > 0) {
@@ -90,10 +92,31 @@ exports.registerCalled = async (req, res) => {
 
         await connection.commit()
 
-        res.status(201).json({ message: 'Chamado criado com sucesso!', calledId });
+        res.status(201).json({ authorization: true, message: 'Chamado criado com sucesso!', calledId });
 
     } catch (error) {
-        console.error("Erro ao criar chamado:", error.message);
+        console.error("Erro ao criar chamado:", error);
         res.status(500).json({ error: "Erro interno no servidor" });
+    }
+};
+
+exports.updatePassword = async (req, res) => {
+    const { newPassword, confirmPassword } = req.body;
+
+    if (newPassword != confirmPassword) {
+        return res.status(403).json({message: "Invalid password"});
+    }
+
+    const connection = await pool.getConnection();
+    try {
+
+        connection.beginTransaction();
+
+        const queryUpdate = `UPDATE users SET password = ? WHERE user_id =`;
+
+        connection.commit();
+
+    } catch (error) {
+
     }
 };
