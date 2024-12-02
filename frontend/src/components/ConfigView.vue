@@ -26,18 +26,6 @@
         <div>
           <form @submit.prevent="updatePassword">
             <div class="mb-3">
-              <label for="currentPassword" class="form-label"
-                >Senha Atual</label
-              >
-              <input
-                type="password"
-                id="currentPassword"
-                class="form-control"
-                v-model="currentPassword"
-                required
-              />
-            </div>
-            <div class="mb-3">
               <label for="newPassword" class="form-label">Nova Senha</label>
               <input
                 type="password"
@@ -73,16 +61,43 @@
 
 <script setup>
 import { ref } from "vue";
+import { useUpdatePassword } from "../store/index.js";
 
+const storeUpdatePassword = useUpdatePassword();
 const currentPassword = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
-const defaultPicture = ref('');
+const defaultPicture = ref('img/user.png');
 const profilePicture = ref('');
 
 const handleImageChange = () => {
-  
+
 }
 
+const updatePassword = async () => {
+
+  if (newPassword.value.length < 6 && confirmPassword.value.length < 6) {
+    console.log('error: Password must be at least 6 characters');
+    return;
+  }
+
+  const update = {
+    newPassword: newPassword.value,
+    confirmPassword: confirmPassword.value
+  }
+
+  try {
+
+    await storeUpdatePassword(update)
+    onReset();
+
+  } catch (error) {
+  }
+}
+
+const onReset = () => {
+  newPassword.value = '';
+  confirmPassword.value = '';
+}
 
 </script>

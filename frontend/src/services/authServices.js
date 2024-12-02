@@ -9,7 +9,6 @@ export const login = async (username, password) => {
         }, {
             withCredentials: true
         });
-        console.log(response.data)
         return response.data;
     } catch (error) {
         console.log(error || 'Erro ao realizar login');
@@ -54,12 +53,31 @@ export const getCalled = async () => {
             withCredentials: true
         });
 
-        console.log(response.data);
-
         return response.data;
 
     } catch (error) {
         console.error(error.message || 'Erro ao buscar lista de chamados');
         throw error;
     }
+}
+
+export const updatePassword = async () => {
+    const update = {
+        newPassword, 
+        confirmPassword
+    }
+
+    try {
+
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}updatePassword`, update, {
+        }, {
+            withCredentials: true,
+        });
+
+        return response.data;
+
+    } catch (error) {
+        console.log(error);
+    }
+
 }

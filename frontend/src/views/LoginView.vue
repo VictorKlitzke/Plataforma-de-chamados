@@ -54,7 +54,7 @@
         </div>
 
         <!-- Opções adicionais -->
-        <div class="text-center mt-4">
+        <!-- <div class="text-center mt-4">
           <p class="text-muted">Não tem uma conta?</p>
           <router-link to="/register">
           <button
@@ -66,7 +66,7 @@
           </button>
           </router-link>
 
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

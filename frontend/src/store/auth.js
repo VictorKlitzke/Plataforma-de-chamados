@@ -8,6 +8,7 @@ export const useAuth = () => {
         try {
             const userData = await login(username, password);
             user.value = userData;
+            localStorage.setItem('UserId', userData.UserId);
         } catch (error) {
             throw new Error('Erro ao realizar login');
         }
