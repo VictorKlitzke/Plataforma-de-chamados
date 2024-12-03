@@ -23,6 +23,8 @@ export const registerCalled = async () => {
         formData.append('description', description);
         formData.append('priority', priority);
         formData.append('imagens', imagens);
+        formData.append('contact', contact);
+        formData.append('category', category);
 
         if (Array.isArray(imagens.value)) {
             imagens.value.forEach((image) => {
@@ -32,15 +34,15 @@ export const registerCalled = async () => {
             console.error('imagens.value não é um array');
         }
 
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/registerCalled`, formData, {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}registerCalled`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
-        }, {
-            withCredentials: true,
-        });
+            withCredentials: true 
+        })
 
         return response.data;
+
     } catch (error) {
         console.log(error || 'Erro ao realizar abertura de chamado');
     }
@@ -63,13 +65,16 @@ export const getCalled = async () => {
 
 export const updatePassword = async () => {
     const update = {
-        newPassword, 
+        newPassword,
         confirmPassword
     }
 
+    console.log(update);
+    
+
     try {
 
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}updatePassword`, update, {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/updatePassword`, update, {
         }, {
             withCredentials: true,
         });

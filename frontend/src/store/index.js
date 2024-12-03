@@ -16,7 +16,7 @@ export const useCalledStore = defineStore('calledStore', {
             try {
 
                 const newCalled = await registerCalled(payload);
-                this.called.push(newCalled);
+                this.called.push(payload);
                 return newCalled;
 
             } catch (error) {

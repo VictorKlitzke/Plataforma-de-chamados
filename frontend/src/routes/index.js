@@ -38,7 +38,7 @@ const routes = [
             },
             {
                 path: '/config',
-                name: 'config',
+                name: 'Configuração',
                 auth: true,
                 component: ConfigView,
                 meta: {showInSidebar: true},

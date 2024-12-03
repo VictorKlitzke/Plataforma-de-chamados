@@ -1,29 +1,34 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-dark bg-dark shadow-sm">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Plataforma de Chamados</a>
-      <div class="d-flex">
-        <span class="navbar-text me-3"> {{ username }} </span>
-        <button class="btn btn-outline-danger" @click="logout">Sair</button>
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-tools fs-4 me-2"></i>
+        <span class="fw-semibold text-white">Plataforma de Chamados</span>
+      </a>
+
+      <div class="d-flex align-items-center ms-auto">
+        <button class="btn btn-outline-light btn-sm" @click="logout">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
-const user = ref(localStorage.getItem('username') || 'Usuário Desconhecido');
-const username = user.value;
 const router = useRouter();
 
+// Função para remover dados do Local Storage
 const removeStorage = () => {
   localStorage.removeItem('username');
+  localStorage.removeItem('userAvatar');
   user.value = 'Usuário Desconhecido';
-}
+};
 
+// Função de Logout
 const logout = async () => {
   try {
     await axios.post(`${import.meta.env.VITE_BASE_URL}logout`, {}, { withCredentials: true });
@@ -34,3 +39,17 @@ const logout = async () => {
   }
 };
 </script>
+
+<style scoped>
+
+img {
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+}
+
+span {
+  font-size: 0.75rem;
+}
+
+</style>
