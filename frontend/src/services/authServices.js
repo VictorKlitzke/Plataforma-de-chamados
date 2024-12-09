@@ -23,7 +23,6 @@ export const registerCalled = async () => {
         formData.append('description', description);
         formData.append('priority', priority);
         formData.append('imagens', imagens);
-        formData.append('contact', contact);
         formData.append('category', category);
 
         if (Array.isArray(imagens.value)) {
@@ -38,7 +37,7 @@ export const registerCalled = async () => {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
-            withCredentials: true 
+            withCredentials: true
         })
 
         return response.data;
@@ -63,26 +62,19 @@ export const getCalled = async () => {
     }
 }
 
-export const updatePassword = async () => {
-    const update = {
-        newPassword,
-        confirmPassword
-    }
-
-    console.log(update);
-    
-
+export const updatePassword = async (update) => {
     try {
-
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/updatePassword`, update, {
-        }, {
-            withCredentials: true,
-        });
+        const response = await axios.put(
+            `${import.meta.env.VITE_BASE_URL}updatePassword`,
+            update,
+            { withCredentials: true }
+        );
 
         return response.data;
-
     } catch (error) {
-        console.log(error);
+        console.error("Erro na API de atualização:", error.response?.data || error);
+        throw new Error(
+            error.response?.data?.message || "Erro ao atualizar a senha."
+        );
     }
-
 }

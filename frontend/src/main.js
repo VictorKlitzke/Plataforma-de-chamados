@@ -4,7 +4,6 @@ import router from "./routes/index.js";
 import { createPinia } from "pinia";
 
 import { useAuth } from "./store/auth.js";
-import './plugins/devexpress.js'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';

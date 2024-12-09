@@ -19,12 +19,12 @@
             />
             <h5 class="fw-bold text-secondary">Sua Foto</h5>
             <p class="text-muted">Clique abaixo para alterar</p>
-            <DxButton
-              text="Alterar Foto"
-              type="default"
-              class="btn-outline-primary btn-sm"
+            <button
+              class="btn btn-outline-primary btn-sm"
               @click="triggerFileInput"
-            />
+            >
+              Alterar Foto
+            </button>
             <input
               type="file"
               id="uploadImage"
@@ -44,73 +44,55 @@
             <p class="text-muted">
               Atualize sua senha para manter sua conta segura.
             </p>
-            <DxForm
-              :formData="{ newPassword, confirmPassword }"
-              labelLocation="top"
-              @onSubmit.prevent="updatePassword"
-            >
-              <div>
-                <div class="form-group mb-3 position-relative">
-                  <DxTextBox
-                    label="Nova Senha"
-                    v-model="newPassword"
-                    :mode="showNewPassword ? 'text' : 'password'"
-                    class="w-100"
-                    :validationRules="[
-                      {
-                        type: 'stringLength',
-                        min: 6,
-                        message: 'Senha deve ter pelo menos 6 caracteres',
-                      },
-                    ]"
-                  />
-                  <span
-                    class="position-absolute toggle-password"
-                    @click="toggleNewPasswordVisibility"
-                  >
-                    <i
-                      :class="
-                        showNewPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
-                      "
-                    ></i>
-                  </span>
-                </div>
-
-                <!-- Confirmar Nova Senha -->
-                <div class="form-group mb-3 position-relative">
-                  <DxTextBox
-                    label="Confirmar Nova Senha"
-                    v-model="confirmPassword"
-                    :mode="showConfirmPassword ? 'text' : 'password'"
-                    class="w-100"
-                    :validationRules="[
-                      {
-                        type: 'stringLength',
-                        min: 6,
-                        message: 'Senha deve ter pelo menos 6 caracteres',
-                      },
-                    ]"
-                  />
-                  <span
-                    class="position-absolute toggle-password"
-                    @click="toggleConfirmPasswordVisibility"
-                  >
-                    <i
-                      :class="
-                        showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
-                      "
-                    ></i>
-                  </span>
-                </div>
+            <form @submit.prevent="updatePassword">
+              <div class="mb-3 position-relative">
+                <label for="newPassword" class="form-label">Nova Senha</label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  :type="showNewPassword ? 'text' : 'password'"
+                  class="form-control"
+                  v-model="newPassword"
+                  placeholder="Digite a nova senha"
+                />
+                <span
+                  class="position-absolute toggle-password"
+                  @click="toggleNewPasswordVisibility"
+                >
+                  <i
+                    :class="showNewPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                  ></i>
+                </span>
               </div>
-            </DxForm>
-            <DxButton
-              text="Alterar Senha"
-              type="success"
-              class="mt-3"
-              :useSubmitBehavior="true"
-              @click="updatePassword()"
-            />
+
+              <div class="mb-3 position-relative">
+                <label for="confirmPassword" class="form-label"
+                  >Confirmar Nova Senha</label
+                >
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  class="form-control"
+                  v-model="confirmPassword"
+                  placeholder="Confirme a nova senha"
+                />
+                <span
+                  class="position-absolute toggle-password"
+                  @click="toggleConfirmPasswordVisibility"
+                >
+                  <i
+                    :class="
+                      showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
+                    "
+                  ></i>
+                </span>
+              </div>
+
+              <button class="btn btn-success w-100" type="submit">
+                Alterar Senha
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -124,18 +106,24 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
               <span class="text-dark">Notificações por E-mail</span>
-              <DxSwitch
-                :value="emailNotifications"
-                @update:value="emailNotifications = $event"
-              />
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  v-model="emailNotifications"
+                />
+              </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3">
               <span class="text-dark">Notificações por Whatsapp</span>
-              <DxSwitch
-                :value="zapNotifications"
-                @update:value="zapNotifications = $event"
-              />
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  v-model="zapNotifications"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -146,10 +134,9 @@
 
 <script setup>
 import { ref } from "vue";
-import { useUpdatePassword } from "../store/index.js";
-import { DxButton, DxTextBox, DxSwitch, DxForm } from "devextreme-vue";
+import { useUpdatePassword } from "../store";
 
-const storeUpdatePassword = useUpdatePassword();
+const storePassword = useUpdatePassword();
 const newPassword = ref("");
 const confirmPassword = ref("");
 const emailNotifications = ref(false);
@@ -183,18 +170,23 @@ const handleImageChange = (event) => {
 };
 
 const updatePassword = async () => {
+  if (newPassword.value !== confirmPassword.value) {
+    alert("As senhas não coincidem!");
+    return;
+  }
+
   const update = {
     newPassword: newPassword.value,
     confirmPassword: confirmPassword.value,
   };
 
-  console.log(update);
-
   try {
-    await storeUpdatePassword.updatePassword(update);
+    await storePassword.updatePassword(update);
+    alert("Senha alterada com sucesso!");
     onReset();
   } catch (error) {
-    console.error("Erro ao atualizar senha:", error);
+    console.error("Erro ao atualizar a senha:", error.message || error);
+    alert("Erro ao atualizar a senha. Tente novamente.");
   }
 };
 

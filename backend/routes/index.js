@@ -7,6 +7,9 @@ const authGet = require("../controllers/gets");
 const upload = require('../middleware/index');
 const auth = require("../middleware/auth");
 
+// UPDATE
+router.put("/updatePassword", auth, authControllers.updatePassword)
+
 // LOGIN e LOGGOUT
 router.post("/login", authControllers.login);
 router.post("/logout", auth, authControllers.logout);

@@ -24,8 +24,6 @@ const router = useRouter();
 // Função para remover dados do Local Storage
 const removeStorage = () => {
   localStorage.removeItem('username');
-  localStorage.removeItem('userAvatar');
-  user.value = 'Usuário Desconhecido';
 };
 
 // Função de Logout
@@ -41,15 +39,5 @@ const logout = async () => {
 </script>
 
 <style scoped>
-
-img {
-  width: 20px;
-  height: 20px;
-  object-fit: cover;
-}
-
-span {
-  font-size: 0.75rem;
-}
 
 </style>
